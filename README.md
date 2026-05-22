@@ -1,6 +1,6 @@
 # Hostel Gatepass Management System 🏫
 
-**Built for:** Indian Institute of Information Technology (IIIT)  
+**Built for:** Indian Institute of Information Technology Sricity 
 **Developed by:** K. Raghuveer and B. Tharun Reddy  
 
 ---
