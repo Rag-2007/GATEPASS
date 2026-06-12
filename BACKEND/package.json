@@ -1,0 +1,29 @@
+{
+  "dependencies": {
+    "@nestjs/common": "^11.1.26",
+    "@nestjs/core": "^11.1.26",
+    "@nestjs/mapped-types": "^2.1.1",
+    "@nestjs/platform-express": "^11.1.26",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "jsonwebtoken": "^9.0.3",
+    "node": "^26.3.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "uuid": "^14.0.0"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.22",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.9.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  },
+  "scripts": {
+    "build": "nest build",
+    "start": "ts-node src/main.ts",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main"
+  }
+}

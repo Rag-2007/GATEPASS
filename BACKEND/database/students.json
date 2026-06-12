@@ -1,0 +1,13 @@
+[
+  {
+    "Roll_NO": "22B81A0501",
+    "USER_ID": "4",
+    "Hostel_Id": "BH1",
+    "IS_BLOCKED": false,
+    "DEFAULTER_Attempts": 1,
+    "PARENT_MAIL": "ramesh@gmail.com",
+    "PARENT_NAME": "Ramesh Kumar",
+    "ADDRESS": "Hyderabad, Telangana",
+    "PARENT_PHONE": "123456789"
+  }
+]

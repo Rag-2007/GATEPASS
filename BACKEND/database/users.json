@@ -1,0 +1,38 @@
+[
+  {
+    "USER_ID": "1",
+    "Name": "Super Warden",
+    "Email": "superwarden@hostel.com",
+    "PhoneNo": "9999999999",
+    "Role": "Warden",
+    "Password_Hash": "579839b860bdcbe5a96478edf654a04e94c8c0cb31a45cac056fa179c67e4442*b1d49c4d634d4c96",
+    "RefreshToken": "11081a4a4725c3fcf369d820286de8dfa36d407f1738d258756c6c4682935e5c*69fbb559c1ba512d"
+  },
+  {
+    "USER_ID": "2",
+    "Name": "Ravi Kumar",
+    "Email": "ravi.bh1@hostel.com",
+    "PhoneNo": "9876543210",
+    "Role": "CareTaker",
+    "Password_Hash": "ec4282548cf391296e4a84e95354abc18adeb69c85610c7cb8808a966d27f285*65852d2fa8f15fe4",
+    "RefreshToken": null
+  },
+  {
+    "USER_ID": "3",
+    "Name": "Suresh Kumar",
+    "Email": "suresh.bh1@hostel.com",
+    "PhoneNo": "9876543211",
+    "Role": "Warden",
+    "Password_Hash": "3ff34c05b19ab66a56a53e03485035764ea8698e5fa36df9b07c3d2462d6f4ab*a8dbc429dc12b4a5",
+    "RefreshToken": "c1cdf51e146b2a059af8bad7b3a35bbc6e82ae6461414dde7341a07d1c559744*fedb2193d3e6af61"
+  },
+  {
+    "USER_ID": "4",
+    "Name": "Tharun Reddy",
+    "Email": "arjun@student.com",
+    "PhoneNo": "9876543200",
+    "Role": "Student",
+    "Password_Hash": "60408e3b0f13ded589425b33b421fcfe8fd5cee862312afbd7b38c6c3aba0e4a*d3cf338572294a6c",
+    "RefreshToken": null
+  }
+]
