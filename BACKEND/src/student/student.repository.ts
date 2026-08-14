@@ -1,12 +1,11 @@
 import { Injectable } from "@nestjs/common";
-import { promises as fs } from 'fs';
-import * as path from 'path';
+import {PrismaService} from "../prisma/prisma.service";
 
 export interface Student {
     Roll_NO: string;
     USER_ID: string;
-    Hostel_Id: string;
-    IS_BLOCKED: boolean;
+    Block_Id: string;
+    Is_Blocked: boolean;
     DEFAULTER_Attempts: number;
     PARENT_MAIL: string;
     PARENT_NAME: string;
@@ -16,115 +15,100 @@ export interface Student {
 
 @Injectable()
 export class StudentRepository {
-
-    private filePath = path.join(
-        process.cwd(),
-        'database',
-        'students.json',
-    );
-
-    private async readStudents(): Promise<Student[]> {
-        const data = await fs.readFile(
-            this.filePath,
-            'utf-8',
-        );
-
-        return JSON.parse(data);
-    }
-
-    private async writeStudents(students: Student[]) {
-        await fs.writeFile(
-            this.filePath,
-            JSON.stringify(students, null, 2),
-        );
-    }
+    constructor(private readonly prisma: PrismaService,){}
 
     async addStudent(student: Student) {
-        const students = await this.readStudents();
-        students.push(student);
-        await this.writeStudents(students);
+        return await this.prisma.student.create({
+            data: {
+                User_Id: student.USER_ID,
+                Roll_No: student.Roll_NO,
+                Block_Id: student.Block_Id,
+                Is_Blocked: student.Is_Blocked,
+                DEFAULTER_Attempts: student.DEFAULTER_Attempts,
+                PARENT_MAIL: student.PARENT_MAIL,
+                PARENT_NAME: student.PARENT_NAME,
+                ADDRESS: student.ADDRESS,
+                PARENT_PHONE: student.PARENT_PHONE
+            }
+        });
     }
 
     async findByRollNo(rollNo: string) {
-        const students = await this.readStudents();
-        return students.find(
-            s => s.Roll_NO === rollNo,
-        );
+        return await this.prisma.student.findUnique({
+            where: {
+                Roll_No: rollNo
+            }
+        });
     }
 
     async deleteStudent(rollNo: string) {
-        const students = await this.readStudents();
-        const updated = students.filter(
-            s => s.Roll_NO !== rollNo,
-        );
-        await this.writeStudents(updated);
+        return await this.prisma.student.delete({
+            where: {
+                Roll_No: rollNo
+            }
+        });
     }
 
     async getAllStudents() {
-        return await this.readStudents();
+        return await this.prisma.student.findMany();
     }
 
     async getByHostel(hostelId: string) {
-        const students = await this.readStudents();
-        return students.filter(
-            s => s.Hostel_Id === hostelId,
-        );
+        return await this.prisma.student.findMany({
+            where: {
+                Block_Id: hostelId
+            }
+        });
     }
 
     async updateStudent(rollNo: string,updatedData: Partial<Student>){
-        const students = await this.readStudents();
-        const index = students.findIndex(
-            s => s.Roll_NO === rollNo,
-        );
-        if (index === -1) {
-            return null;
-        }
-        students[index] = {...students[index],...updatedData};
-        await this.writeStudents(students);
-        return students[index];
+        return await this.prisma.student.update({
+            where: {
+                Roll_No: rollNo
+            },
+            data: updatedData
+        });
+
     }
 
     async findByUserId(userId: string) {
-        const students = await this.readStudents();
-        return students.find(
-            s => s.USER_ID === userId,
-        );
+        return await this.prisma.student.findUnique({
+            where: {
+                User_Id: userId
+            }
+        });
     }
 
     async updateBlockedStatus(rollNo: string, isBlocked: boolean) {
-        const students = await this.readStudents();
-        const index = students.findIndex(
-            s => s.Roll_NO === rollNo,
-        );
-        if (index === -1) {
-            return null;
-        }
-        students[index].IS_BLOCKED = isBlocked;
-        await this.writeStudents(students);
+        return await this.prisma.student.update({
+            where: {
+                Roll_No: rollNo
+            },
+            data: {
+                Is_Blocked: isBlocked
+            }
+        });
     }
     
     async incrementDefaulterAttempts(rollNo: string) {
-        const students = await this.readStudents();
-        const index = students.findIndex(
-            s => s.Roll_NO === rollNo,
-        );
-        if (index === -1) {
-            return null;
-        }
-        students[index].DEFAULTER_Attempts += 1;
-        await this.writeStudents(students);
+        return await this.prisma.student.update({
+            where: {
+                Roll_No: rollNo
+            },
+            data: {
+                DEFAULTER_Attempts: { increment: 1 }    
+            }
+        });
     }
 
     async resetDefaulterAttempts(rollNo: string) {
-        const students = await this.readStudents();
-        const index = students.findIndex(
-            s => s.Roll_NO === rollNo,
-        );
-        if (index === -1) {
-            return null;
-        }
-        students[index].DEFAULTER_Attempts = 0;
-        await this.writeStudents(students);
+        return await this.prisma.student.update({
+            where: {
+                Roll_No: rollNo
+            },
+            data: {
+                DEFAULTER_Attempts: 0
+            }
+        });
     }
-
 }

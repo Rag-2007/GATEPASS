@@ -4,6 +4,7 @@ import { AuthService } from '../auth/auth.service';
 import { AuthRepository } from '../auth/auth.repository';
 import { HostelRepository } from './hostel.repository';
 import { UserRole } from '../auth/dto/login.dto';
+import { promises } from 'dns';
 
 @Injectable()
 export class HostelService {
@@ -26,8 +27,7 @@ export class HostelService {
                 Name: hostel.CareTaker_Name,
                 Email: hostel.CareTaker_Email,
                 PhoneNo: hostel.CareTaker_PhoneNo,
-                password:
-                    hostel.CareTaker_Password,
+                password: hostel.CareTaker_Password,
                 role: UserRole.CARETAKER,
             });
         const warden =
@@ -57,8 +57,8 @@ export class HostelService {
                 'Hostel not found',
             );
         }
-        await this.authrepo.deleteUser(hostel.CareTaker_ID);
-        await this.authrepo.deleteUser(hostel.Warden_ID);
+        await this.authrepo.deleteUser(hostel.CareTaker_Id);
+        await this.authrepo.deleteUser(hostel.Warden_Id);
         await this.hostelrepo.deleteHostel(HostelID);
         return {message:'Hostel deleted successfully'};
     }
@@ -71,7 +71,7 @@ export class HostelService {
             );
         }
         await this.authrepo.updateUser(
-            existing.CareTaker_ID,
+            existing.CareTaker_Id,
             {
                 Name:
                     hostel.CareTaker_Name,
@@ -82,7 +82,7 @@ export class HostelService {
             },
         );
         await this.authrepo.updateUser(
-            existing.Warden_ID,
+            existing.Warden_Id,
             {
                 Name:
                     hostel.Warden_Name,
@@ -97,29 +97,26 @@ export class HostelService {
 
     async getAllHostels() {
         const hostels = await this.hostelrepo.getAll();
-        let result = [];
-        for (const hostel of hostels) {
-            const caretaker =
-                await this.authrepo.findUserById(
-                    hostel.CareTaker_ID,
-                );
-            const warden =
-                await this.authrepo.findUserById(
-                    hostel.Warden_ID,
-                );
-            result.push({
-                Block_Id:
-                    hostel.Block_Id,
 
-                CareTaker: caretaker,
+        const result = await Promise.all(
+            hostels.map(async (hostel) => {
+                const [caretaker, warden] = await Promise.all([
+                    this.authrepo.findUserById(hostel.CareTaker_Id),
+                    this.authrepo.findUserById(hostel.Warden_Id),
+                ]);
 
-                Warden: warden,
-            });
-        }
+                return {
+                    Block_Id: hostel.Block_Id,
+                    CareTaker: caretaker,
+                    Warden: warden,
+                };
+            })
+        );
+
         return result;
-    }
+        }
 
-    async getMe(email: string,role: string){
+    async getMe(email: string,role: string):Promise<any>{
         const user = await this.authrepo.findUserByEmail(email);
         if (!user) {
             throw new NotFoundException(
@@ -127,8 +124,7 @@ export class HostelService {
             );
         }
         const hostels = await this.hostelrepo.getAll();
-        const hostel =
-            hostels.find(h =>role === UserRole.CARETAKER ? h.CareTaker_ID === user.USER_ID : h.Warden_ID ===user.USER_ID);
+        const hostel = hostels.find(h => role === UserRole.CARETAKER ? h.CareTaker_Id === user.Id : h.Warden_Id === user.Id);
         return {user,hostel};
     }
 

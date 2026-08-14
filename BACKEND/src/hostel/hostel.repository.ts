@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { promises as fs } from "fs";
-import * as path from "path";
+import {PrismaService} from "../prisma/prisma.service";
 
 interface Hostel {
     Block_Id: string;
@@ -10,63 +9,45 @@ interface Hostel {
 
 @Injectable()
 export class HostelRepository {
-
-    private filePath = path.join(
-        process.cwd(),
-        'database',
-        'hostels.json',
-    );
-
-    private async readHostels(): Promise<Hostel[]> {
-        const data = await fs.readFile(
-            this.filePath,
-            'utf-8',
-        );
-
-        return JSON.parse(data);
-    }
-
-    private async writeHostels(hostels: Hostel[]) {
-        await fs.writeFile(
-            this.filePath,
-            JSON.stringify(
-                hostels,
-                null,
-                2,
-            ),
-        );
-    }
+    constructor(private readonly prisma: PrismaService,){}
 
     async findById(blockId: string){
-        const hostels = await this.readHostels();
-        return hostels.find(h => h.Block_Id === blockId);
+        return await this.prisma.hostel.findFirst({
+            where: {
+                Block_Id: blockId
+            }
+        });
     }
 
     async addHostel(hostel: Hostel){
-        const hostels = await this.readHostels();
-        hostels.push(hostel);
-        await this.writeHostels(hostels);
+        return await this.prisma.hostel.create({
+            data: {
+                Block_Id: hostel.Block_Id,
+                CareTaker_Id: hostel.CareTaker_ID,
+                Warden_Id: hostel.Warden_ID
+            }
+        });
     }
 
     async deleteHostel(blockId: string){
-        const hostels = await this.readHostels();
-        const updated = hostels.filter(h => h.Block_Id !== blockId);
-        await this.writeHostels(updated);
+        return await this.prisma.hostel.delete({
+            where: {
+                Block_Id: blockId
+            }
+        });
     }
 
-    async updateHostel(blockId: string,updatedData: Partial<Hostel>){
-        const hostels = await this.readHostels();
-        const index = hostels.findIndex(h => h.Block_Id === blockId);
-        if (index === -1) {
-            return null;
-        }
-        hostels[index] = {...hostels[index],...updatedData};
-        await this.writeHostels(hostels);
-        return hostels[index];
+    async updateHostel(blockId: string, updatedData: Partial<Hostel>){
+        return await this.prisma.hostel.update({
+            where: {
+                Block_Id: blockId
+            },
+            data: updatedData
+        });
     }
 
     async getAll() {
-        return await this.readHostels();
+        return await this.prisma.hostel.findMany();
     }
 
 }

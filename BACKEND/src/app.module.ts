@@ -4,6 +4,7 @@ import { HostelModule } from './hostel/hostel.module';
 import { StudentModule } from './student/student.module';
 import { PassesModule } from './passes/passes.module';
 import { BlockedModule } from './blocked/blocked.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
     imports: [
@@ -11,7 +12,8 @@ import { BlockedModule } from './blocked/blocked.module';
         HostelModule,
         StudentModule,
         PassesModule ,
-        BlockedModule
+        BlockedModule,
+        PrismaModule
     ],
 })
 export class AppModule {}

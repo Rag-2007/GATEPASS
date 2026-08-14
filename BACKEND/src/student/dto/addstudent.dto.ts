@@ -23,7 +23,7 @@ export class AddStudentDto {
 
   @IsString()
   @IsNotEmpty()
-  Hostel_Id!: string;
+  Block_Id!: string;
 
   @IsEmail()
   Parent_Mail!: string;

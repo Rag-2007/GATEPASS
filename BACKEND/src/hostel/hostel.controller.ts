@@ -41,7 +41,7 @@ export class HostelController {
 
     @Get('/getMe')
     @Roles(UserRole.WARDEN,UserRole.CARETAKER)
-    async getMe(@Req() req:any){
+    async getMe(@Req() req:any):Promise<any>{
         const email = req.user.email ;
         const role = req.user.role ;
         return this.hostelservice.getMe(email,role) ;

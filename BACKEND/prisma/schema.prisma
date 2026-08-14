@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  Id               String       @id @default(uuid())
+  Name             String
+  Email            String       @unique
+  Phone            String       @unique
+  Role             Role
+  Password_Hash    String
+  RefreshToken     String?
+  student          Student?
+  passActions      PassAction[]
+  caretakerHostels Hostel?      @relation("CaretakerRelation")
+  wardenHostels    Hostel?      @relation("WardenRelation")
+  blockeds         Blocked[]
+}
+
+model Student {
+  Roll_No            String    @id
+  User_Id            String    @unique
+  Block_Id           String
+  Is_Blocked         Boolean   @default(false)
+  DEFAULTER_Attempts Int       @default(0)
+  PARENT_MAIL        String
+  PARENT_NAME        String
+  ADDRESS            String
+  PARENT_PHONE       String
+  Passes             Pass[]
+  blocked            Blocked[]
+  user               User      @relation(fields: [User_Id], references: [Id])
+  hostel             Hostel    @relation(fields: [Block_Id], references: [Block_Id])
+}
+
+model Hostel {
+  Block_Id     String    @id
+  CareTaker_Id String    @unique
+  Warden_Id    String    @unique
+  Students     Student[]
+  blocked      Blocked[]
+  caretaker    User      @relation("CaretakerRelation", fields: [CareTaker_Id], references: [Id])
+  warden       User      @relation("WardenRelation", fields: [Warden_Id], references: [Id])
+}
+
+model Pass {
+  passID             String       @id @default(uuid())
+  RollNo             String
+  passType           PassType
+  RaisedAt           DateTime     @default(now())
+  Destination        String
+  Purpose            String
+  ModeofTransport    String
+  QRCODE             String       @unique
+  Status             PassStatus   @default(PENDING)
+  Expected_Date      String
+  Expected_Time      String
+  Actual_Return_Date String?
+  Actual_Return_Time String?
+  actions            PassAction[]
+  student            Student      @relation(fields: [RollNo], references: [Roll_No])
+}
+
+model PassAction {
+  Action_Id   String   @id @default(uuid())
+  passID      String
+  Actor_Id    String
+  Action_Type String
+  Remarks     String?
+  Timestamp   DateTime @default(now())
+  pass        Pass     @relation(fields: [passID], references: [passID])
+  actor       User     @relation(fields: [Actor_Id], references: [Id])
+}
+
+model Blocked {
+  id              String    @id @default(uuid())
+  Roll_No         String
+  Hostel_id       String
+  Blocked_Role_ID String
+  BlockedAt       DateTime  @default(now())
+  UnblockedAt     DateTime?
+  student         Student   @relation(fields: [Roll_No], references: [Roll_No])
+  hostel          Hostel    @relation(fields: [Hostel_id], references: [Block_Id])
+  blockedBy       User      @relation(fields: [Blocked_Role_ID], references: [Id])
+}
+
+enum PassType {
+  DAY_PASS  @map("DayPass")
+  HOME_PASS @map("HomePass")
+}
+
+enum PassStatus {
+  PENDING           @map("Pending")
+  CANCELLED         @map("Cancelled")
+  Parentapproved    @map("ParentApproved")
+  CareTakerapproved @map("CaretakerApproved")
+  CHECKEDIN         @map("Active")
+  CHECKEDOUT        @map("Completed")
+}
+
+enum Role {
+  Student    @map("STUDENT")
+  CareTaker  @map("CARETAKER")
+  Warden     @map("WARDEN")
+  Parent     @map("PARENT")
+  Security   @map("SECURITY")
+}
