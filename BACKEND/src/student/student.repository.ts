@@ -89,14 +89,14 @@ export class StudentRepository {
             }
         });
     }
-    
+
     async incrementDefaulterAttempts(rollNo: string) {
         return await this.prisma.student.update({
             where: {
                 Roll_No: rollNo
             },
             data: {
-                DEFAULTER_Attempts: { increment: 1 }    
+                DEFAULTER_Attempts: { increment: 1 }
             }
         });
     }

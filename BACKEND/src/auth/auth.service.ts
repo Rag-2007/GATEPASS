@@ -47,6 +47,18 @@ export class AuthService {
         );
     }
 
+    async updateMe(email: string, data: { Name?: string; Phone?: string; PhoneNo?: string }) {
+        const user = await this.authrepo.findUserByEmail(email);
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        await this.authrepo.updateUser(user.Id, {
+            Name: data.Name,
+            Phone: data.Phone ?? data.PhoneNo,
+        });
+        return { message: 'Profile updated successfully' };
+    }
+
     async ValidateandGenerateTokens(body:LoginDto){
 
         let email = body.Email ;
@@ -81,16 +93,16 @@ export class AuthService {
     async deleteRefreshToken(UserID:string){
         console.log(UserID);
         await this.authrepo.deleteToken(UserID) ;
-    } 
+    }
 
     async RotateTokens(body:RefreshDto) {
-        
+
         let userid = body.userId ;
         let reftok = body.refreshToken ;
 
         try {
             verifyRefreshToken(reftok);
-            
+
         } catch {
             throw new UnauthorizedException(
                 'Invalid refresh token',

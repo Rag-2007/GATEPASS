@@ -8,7 +8,6 @@ import { RolesGuard } from '../auth/guard/role.guard';
 import { UserRole } from '../auth/dto/login.dto';
 import { Roles } from '../auth/guard/roles.decorator';
 
-
 @UseGuards(JwtGuard,RolesGuard)
 @Controller('Blocked')
 
@@ -34,3 +33,4 @@ export class BlockedController {
   }
 
 }
+

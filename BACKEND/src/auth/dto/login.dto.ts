@@ -2,11 +2,11 @@ import { Role } from '@prisma/client';
 import { IsEmail, IsEnum, IsString, MinLength } from 'class-validator';
 
 export enum UserRole {
-  STUDENT = 'Student',
-  CARETAKER = 'CareTaker',
-  WARDEN = 'Warden',
-  PARENT = 'Parent' ,
-  SECURITY = 'Security'
+  STUDENT = 'STUDENT',
+  CARETAKER = 'CARETAKER',
+  WARDEN = 'WARDEN',
+  PARENT = 'PARENT' ,
+  SECURITY = 'SECURITY'
 }
 
 export class LoginDto {

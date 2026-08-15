@@ -8,3 +8,4 @@ export class Defaulter {
         return attempts >= this.DEFAULTER_ATTEMPTS;
     }
 }
+

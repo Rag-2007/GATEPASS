@@ -10,3 +10,4 @@ import { AuthService } from '../auth/auth.service';
   providers: [HostelService,HostelRepository,AuthRepository,AuthService]
 })
 export class HostelModule {}
+

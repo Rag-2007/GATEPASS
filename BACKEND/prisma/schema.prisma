@@ -69,12 +69,12 @@ model Pass {
 model PassAction {
   Action_Id   String   @id @default(uuid())
   passID      String
-  Actor_Id    String
+  Actor_Id    String?
   Action_Type String
   Remarks     String?
   Timestamp   DateTime @default(now())
   pass        Pass     @relation(fields: [passID], references: [passID])
-  actor       User     @relation(fields: [Actor_Id], references: [Id])
+  actor       User?    @relation(fields: [Actor_Id], references: [Id])
 }
 
 model Blocked {
@@ -90,23 +90,24 @@ model Blocked {
 }
 
 enum PassType {
-  DAY_PASS  @map("DayPass")
-  HOME_PASS @map("HomePass")
+  DAY_PASS
+  HOME_PASS
 }
 
 enum PassStatus {
-  PENDING           @map("Pending")
-  CANCELLED         @map("Cancelled")
-  Parentapproved    @map("ParentApproved")
-  CareTakerapproved @map("CaretakerApproved")
-  CHECKEDIN         @map("Active")
-  CHECKEDOUT        @map("Completed")
+  PENDING
+  CANCELLED
+  Parentapproved
+  CareTakerapproved
+  CHECKEDIN
+  CHECKEDOUT
 }
 
 enum Role {
-  Student    @map("STUDENT")
-  CareTaker  @map("CARETAKER")
-  Warden     @map("WARDEN")
-  Parent     @map("PARENT")
-  Security   @map("SECURITY")
+  STUDENT
+  CARETAKER
+  WARDEN
+  PARENT
+  SECURITY
 }
+

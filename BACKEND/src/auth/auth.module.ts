@@ -9,3 +9,4 @@ import { AuthRepository } from './auth.repository';
   providers: [AuthService,AuthRepository]
 })
 export class AuthModule {}
+

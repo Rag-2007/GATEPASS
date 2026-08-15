@@ -190,5 +190,6 @@ export class StudentService {
             DEFAULTER_Attempts:
                 student.DEFAULTER_Attempts,
         };
-    }  
+    }
 }
+

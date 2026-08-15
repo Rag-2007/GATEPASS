@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "Hostel Gatepass",
+    "slug": "rag-gatepass",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "rag-gatepass",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "assetBundlePatterns": [
+      "src/assets/**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.rag.gatepass"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F7F9FB"
+      },
+      "package": "com.rag.gatepass"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
+          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
+          "isAccessMediaLocationEnabled": false
+        }
+      ],
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

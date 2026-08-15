@@ -2,7 +2,6 @@ import * as jwt from 'jsonwebtoken';
 export const ACCESS_SECRET = 'my_super_secret_access_key';
 export const REFRESH_SECRET = 'my_super_secret_refresh_key';
 
-
 export function signAccessToken(payload: object): string {
     return jwt.sign(
         payload,

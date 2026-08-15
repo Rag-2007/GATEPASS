@@ -5,15 +5,13 @@ enum Pass_Type {
 }
 export class CreatePassDto {
 
-
     @IsNotEmpty()
     @IsEnum(Pass_Type)
     passtype!: Pass_Type ;
-    
 
     @IsNotEmpty()
     @IsString()
-    destination!: string; 
+    destination!: string;
 
     @IsNotEmpty()
     @IsString()
@@ -22,7 +20,6 @@ export class CreatePassDto {
     @IsNotEmpty()
     @IsString()
     modeOfTransport!: string  ;
-
 
     @IsNotEmpty()
     @IsDateString()
@@ -33,14 +30,5 @@ export class CreatePassDto {
  )
     expectedTime!: string ;
 
-
 }
-// {
-//    "passtype": "HOME_PASS",
-//    "destination": "Hyderabad",
-//    "purpose": "Festival Vacation",
-//    "modeOfTransport": "Bus",
-//    "Status": "CHECKEDIN",
-//    "expectedDate": "2026-06-15",
-//    "expectedTime": "18:30"
-// }
+

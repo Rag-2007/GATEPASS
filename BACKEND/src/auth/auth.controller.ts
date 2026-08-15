@@ -1,9 +1,10 @@
-import { Controller , Post , Body } from '@nestjs/common';
+import { Controller , Post , Put, Body, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { LogoutDto } from './dto/logout.dto';
 import { SignupDto } from './dto/signup.dto';
+import { JwtGuard } from './guard/jwt.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -21,7 +22,7 @@ export class AuthController {
             const { accessToken, refreshToken , UserID} = await this.authservice.ValidateandGenerateTokens(body) ;
             await this.authservice.setRefreshToken(UserID,refreshToken) ;
             return {
-                accessToken , refreshToken , UserID 
+                accessToken , refreshToken , UserID
             };
         }
         catch(e){
@@ -49,7 +50,14 @@ export class AuthController {
         catch(e){
             throw e ;
         }
-    } 
+    }
+
+    @Put('/updateMe')
+    @UseGuards(JwtGuard)
+    async updateMe(@Req() req: any, @Body() body: { Name?: string; Phone?: string; PhoneNo?: string }) {
+        const email = req.user.email;
+        return await this.authservice.updateMe(email, body);
+    }
 
 }
 

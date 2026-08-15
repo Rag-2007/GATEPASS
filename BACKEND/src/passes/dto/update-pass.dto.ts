@@ -14,5 +14,6 @@ export enum PassStatus {
 export class UpdatePassDto extends PartialType(CreatePassDto) {
     @IsEnum(PassStatus)
     Status!: PassStatus;
-    
+
 }
+

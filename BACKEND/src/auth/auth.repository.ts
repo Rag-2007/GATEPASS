@@ -12,11 +12,10 @@ export interface User {
     RefreshToken: string | null;
 }
 
-
 @Injectable()
 export class AuthRepository{
     constructor(private readonly prisma: PrismaService,){}
-    
+
     async findUserByEmail(email: string):Promise<any> {
         return await this.prisma.user.findUnique({
             where: {
@@ -24,7 +23,6 @@ export class AuthRepository{
             },
         });
     }
-
 
     async createUser(userData: any): Promise<string> {
         const user = await this.prisma.user.create({
@@ -68,7 +66,7 @@ export class AuthRepository{
                 Email: email,
                 Role: role
             },
-            select: {       
+            select: {
                 Id: true,
                 Name: true,
                 Email: true,
@@ -155,3 +153,4 @@ export class AuthRepository{
     }
 
 }
+

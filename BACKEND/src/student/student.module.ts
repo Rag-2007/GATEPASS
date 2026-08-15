@@ -11,3 +11,4 @@ import { AuthRepository } from '../auth/auth.repository';
   providers: [StudentService,AuthService,StudentRepository,AuthRepository]
 })
 export class StudentModule {}
+

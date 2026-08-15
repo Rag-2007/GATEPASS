@@ -19,7 +19,6 @@ export class StudentController {
         return this.studentservice.addStudent(body) ;
     }
 
-
     @Delete('/deleteStudent/:rollno')
     @Roles(UserRole.CARETAKER,UserRole.WARDEN)
     async deleteStudent(@Param('rollno') RollNo:string){
@@ -38,7 +37,6 @@ export class StudentController {
         return this.studentservice.getAll() ;
     }
 
-
     @Get('/getbyHostel/:hostelid')
     @Roles(UserRole.CARETAKER,UserRole.WARDEN)
     async getbyHostel(@Param('hostelid') HostelID:string){
@@ -53,3 +51,4 @@ export class StudentController {
     }
 
 }
+
