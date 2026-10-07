@@ -32,4 +32,4 @@ COPY prisma ./prisma/
 
 EXPOSE 3000
 
-CMD ["node", "dist/main"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
