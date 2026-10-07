@@ -8,6 +8,7 @@ import {
   TextInput,
   View,
   useWindowDimensions,
+  Alert,
 } from "react-native";
 import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -15,6 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import studentLogo from "../../assets/images/login/student-logo.png";
 import GatepassSymbol from "../../components/GatepassSymbol/GatepassSymbol";
 import { useAuth } from "../../store/auth.store";
+import { api } from "../../api/config";
 import { styles } from "./StudentLoginScreen.styles";
 
 export default function StudentLoginScreen() {
@@ -43,6 +45,22 @@ export default function StudentLoginScreen() {
         e?.message ||
         "Login failed. Please try again.";
       setError(Array.isArray(msg) ? msg.join(", ") : msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email.trim()) {
+      Alert.alert("Email Required", "Please enter your email to reset your password.");
+      return;
+    }
+    setLoading(true);
+    try {
+      await api.post("/auth/forgot-password", { email: email.trim() });
+      Alert.alert("Success", "A password reset link has been sent to your email.");
+    } catch (e: any) {
+      Alert.alert("Error", e?.response?.data?.message || e?.message || "Failed to send reset link.");
     } finally {
       setLoading(false);
     }
@@ -96,7 +114,9 @@ export default function StudentLoginScreen() {
             <View style={styles.fieldGroup}>
               <View style={styles.passwordLabelRow}>
                 <Text style={styles.label}>Password</Text>
-                <Text style={styles.forgotText}>Forgot Password?</Text>
+                <Pressable onPress={handleForgotPassword} hitSlop={8}>
+                  <Text style={styles.forgotText}>Forgot Password?</Text>
+                </Pressable>
               </View>
               <View style={styles.inputWrap}>
                 <GatepassSymbol

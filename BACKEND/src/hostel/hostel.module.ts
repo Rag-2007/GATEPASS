@@ -2,12 +2,11 @@ import { Module } from '@nestjs/common';
 import { HostelController } from './hostel.controller';
 import { HostelService } from './hostel.service';
 import { HostelRepository } from './hostel.repository';
-import { AuthRepository } from '../auth/auth.repository';
-import { AuthService } from '../auth/auth.service';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
+  imports: [AuthModule],
   controllers: [HostelController],
-  providers: [HostelService,HostelRepository,AuthRepository,AuthService]
+  providers: [HostelService,HostelRepository]
 })
 export class HostelModule {}
-

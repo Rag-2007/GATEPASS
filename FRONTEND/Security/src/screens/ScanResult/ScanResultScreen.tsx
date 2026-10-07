@@ -40,6 +40,7 @@ export default function ScanResultScreen() {
     rollNumber: string;
     passType: string;
     room: string;
+    photoUrl: string | null;
   } | null>(null);
 
   useEffect(() => {
@@ -64,6 +65,7 @@ export default function ScanResultScreen() {
           rollNumber: student.Roll_No || "—",
           passType: pass.passType === "HOME_PASS" || pass.passtype === "HOME_PASS" ? "Home Pass" : "Day Pass",
           room: student.Block_Id || "—",
+          photoUrl: student.Photo_Url ?? null,
         });
       })
       .catch((err) => {
@@ -165,23 +167,43 @@ export default function ScanResultScreen() {
         </View>
 
         <View style={styles.successBody}>
-        <View style={styles.successCard}>
-          <View style={styles.successMark}>
-            <GatepassSymbol name="checkmark" size={36} color="#FFFFFF" weight="bold" />
-          </View>
-          <Text style={styles.successTitle}>Valid Gatepass</Text>
-          <Text style={styles.readyLabel}>Ready for {verificationLabel}</Text>
+          <View style={styles.successCard}>
 
-          <View style={styles.successDetails}>
-            <DetailItem label="NAME" value={studentInfo.name} />
-            <DetailItem label="PASS TYPE" value={studentInfo.passType} />
-          </View>
-        </View>
+            <View style={styles.photoWrapper}>
+              {studentInfo.photoUrl ? (
+                <Image
+                  source={{ uri: studentInfo.photoUrl }}
+                  style={styles.studentPhoto}
+                  contentFit="cover"
+                />
+              ) : (
+                <View style={styles.studentPhotoFallback}>
+                  <GatepassSymbol name="person.fill" size={44} color="#FFE38A" weight="regular" />
+                </View>
+              )}
+              <View style={styles.verifyBadge}>
+                <GatepassSymbol name="checkmark" size={14} color="#FFFFFF" weight="bold" />
+              </View>
+            </View>
 
-        <Pressable style={styles.confirmButton} onPress={handleConfirm}>
-          <GatepassSymbol name="checkmark" size={21} color="#FFFFFF" weight="bold" />
-          <Text style={styles.confirmButtonText}>Confirm {scanMode === "out" ? "Exit" : "Entry"}</Text>
-        </Pressable>
+            <Text style={styles.studentName}>{studentInfo.name}</Text>
+            <Text style={styles.studentRoll}>{studentInfo.rollNumber}</Text>
+
+            <View style={styles.verifyBanner}>
+              <GatepassSymbol name="checkmark.shield.fill" size={16} color="#087A54" weight="regular" />
+              <Text style={styles.verifyBannerText}>Identity Verified — {verificationLabel}</Text>
+            </View>
+
+            <View style={styles.successDetails}>
+              <DetailItem label="BLOCK / HOSTEL" value={studentInfo.room} />
+              <DetailItem label="PASS TYPE" value={studentInfo.passType} />
+            </View>
+          </View>
+
+          <Pressable style={styles.confirmButton} onPress={handleConfirm}>
+            <GatepassSymbol name="checkmark" size={21} color="#FFFFFF" weight="bold" />
+            <Text style={styles.confirmButtonText}>Confirm {scanMode === "out" ? "Exit" : "Entry"}</Text>
+          </Pressable>
         </View>
       </ScrollView>
     </View>
@@ -233,10 +255,10 @@ const styles = StyleSheet.create({
   },
   successCard: {
     alignItems: "center",
-    borderRadius: 8,
+    borderRadius: 14,
     backgroundColor: "#FFFFFF",
     paddingHorizontal: 20,
-    paddingTop: 24,
+    paddingTop: 0,
     paddingBottom: 20,
     marginTop: -50,
     shadowColor: "#00122F",
@@ -245,33 +267,81 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     elevation: 6,
   },
-  successMark: {
-    width: 72,
-    height: 72,
+  photoWrapper: {
+    marginTop: -50,
+    marginBottom: 14,
+    position: "relative",
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 36,
+  },
+  studentPhoto: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 4,
+    borderColor: "#FFFFFF",
+    backgroundColor: "#0D1B2A",
+  },
+  studentPhotoFallback: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 4,
+    borderColor: "#FFFFFF",
+    backgroundColor: "#0D1B2A",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  verifyBadge: {
+    position: "absolute",
+    bottom: 2,
+    right: 2,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     backgroundColor: "#129C5B",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
   },
-  successTitle: {
+  studentName: {
     color: "#000A1E",
-    fontSize: 25,
+    fontSize: 22,
     fontWeight: "800",
     letterSpacing: 0,
-    marginTop: 14,
+    textAlign: "center",
   },
-  readyLabel: {
+  studentRoll: {
+    color: "#6B7280",
+    fontSize: 13,
+    fontWeight: "700",
+    letterSpacing: 0,
+    marginTop: 3,
+    textAlign: "center",
+  },
+  verifyBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "#EDFAF4",
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  verifyBannerText: {
     color: "#087A54",
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "800",
     letterSpacing: 0,
-    marginTop: 6,
   },
   successDetails: {
     alignSelf: "stretch",
     borderTopWidth: 1,
     borderTopColor: "#E6EAF0",
-    marginTop: 22,
+    marginTop: 16,
   },
   detailItem: {
     minHeight: 54,
@@ -304,6 +374,7 @@ const styles = StyleSheet.create({
     gap: 9,
     borderRadius: 6,
     backgroundColor: "#000A1E",
+    marginTop: 20,
   },
   confirmButtonText: {
     color: "#FFFFFF",
@@ -398,24 +469,6 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     letterSpacing: 0,
   },
-  contactButton: {
-    alignSelf: "stretch",
-    minHeight: 50,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    borderWidth: 1,
-    borderColor: "#0077B6",
-    borderRadius: 6,
-    marginTop: 12,
-  },
-  contactButtonText: {
-    color: "#0077B6",
-    fontSize: 15,
-    fontWeight: "800",
-    letterSpacing: 0,
-  },
   dashboardLink: {
     minHeight: 42,
     alignItems: "center",
@@ -429,4 +482,3 @@ const styles = StyleSheet.create({
     letterSpacing: 0,
   },
 });
-

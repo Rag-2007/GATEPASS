@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
 import { StudentController } from './student.controller';
 import { StudentService } from './student.service';
-import { AuthService } from '../auth/auth.service';
 import { StudentRepository } from './student.repository';
-import { AuthRepository } from '../auth/auth.repository';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
+  imports: [AuthModule],
   exports: [StudentRepository],
   controllers: [StudentController],
-  providers: [StudentService,AuthService,StudentRepository,AuthRepository]
+  providers: [StudentService,StudentRepository]
 })
 export class StudentModule {}
-

@@ -24,6 +24,8 @@ export class StudentService {
             role : UserRole.STUDENT,
         });
         const userId = res.UserID ;
+        const encodedName = encodeURIComponent(body.Name);
+        const photoUrl = `https://ui-avatars.com/api/?background=0D1B2A&color=FFE38A&size=256&bold=true&name=${encodedName}`;
         await this.studentrepo.addStudent({
             Roll_NO: body.Roll_NO,
             USER_ID: String(userId),
@@ -34,6 +36,7 @@ export class StudentService {
             PARENT_NAME: body.Parent_Name,
             ADDRESS: body.Address,
             PARENT_PHONE: body.Parent_Phone,
+            Photo_Url: photoUrl,
         });
         return {message: 'Student added successfully',userId};
     }

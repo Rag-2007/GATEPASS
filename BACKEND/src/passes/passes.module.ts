@@ -9,9 +9,21 @@ import { StudentRepository } from '../student/student.repository';
 import { BlockedService } from 'src/blocked/blocked.service';
 import { HostelRepository } from 'src/hostel/hostel.repository';
 import { Defaulter } from 'src/common/defaulter';
+import { ParentTokenRepository } from './parent-token.repository';
+
 @Module({
   imports: [BlockedModule],
   controllers: [PassesController],
-  providers: [PassesService, PassesRepository, PassActionsRepository, AuthRepository, StudentRepository, BlockedService, HostelRepository, Defaulter],
+  providers: [
+    PassesService,
+    PassesRepository,
+    PassActionsRepository,
+    AuthRepository,
+    StudentRepository,
+    BlockedService,
+    HostelRepository,
+    Defaulter,
+    ParentTokenRepository,
+  ],
 })
-export class PassesModule { }
+export class PassesModule {}

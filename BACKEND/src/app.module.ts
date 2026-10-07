@@ -6,16 +6,18 @@ import { StudentModule } from './student/student.module';
 import { PassesModule } from './passes/passes.module';
 import { BlockedModule } from './blocked/blocked.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
+        MailModule,
         AuthModule,
         HostelModule,
         StudentModule,
-        PassesModule ,
+        PassesModule,
         BlockedModule,
-        PrismaModule
+        PrismaModule,
     ],
 })
 export class AppModule {}

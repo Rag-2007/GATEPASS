@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const BASE_URL = "http://10.0.98.89:3000";
+export const BASE_URL = "http://10.238.204.46:3000";
 
 const SECURITY_SECRET = "gatepass_security_iiit_2026";
 

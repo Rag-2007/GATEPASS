@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -20,6 +21,7 @@ model User {
   caretakerHostels Hostel?      @relation("CaretakerRelation")
   wardenHostels    Hostel?      @relation("WardenRelation")
   blockeds         Blocked[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 model Student {
@@ -32,6 +34,7 @@ model Student {
   PARENT_NAME        String
   ADDRESS            String
   PARENT_PHONE       String
+  Photo_Url          String    @default("https://ui-avatars.com/api/?background=0D1B2A&color=FFE38A&size=256&bold=true&name=Student")
   Passes             Pass[]
   blocked            Blocked[]
   user               User      @relation(fields: [User_Id], references: [Id])
@@ -75,6 +78,23 @@ model PassAction {
   Timestamp   DateTime @default(now())
   pass        Pass     @relation(fields: [passID], references: [passID])
   actor       User?    @relation(fields: [Actor_Id], references: [Id])
+}
+
+model ParentApprovalToken {
+  id        String    @id @default(uuid())
+  passId    String    @unique
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String    
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  user      User      @relation(fields: [userId], references: [Id])
 }
 
 model Blocked {

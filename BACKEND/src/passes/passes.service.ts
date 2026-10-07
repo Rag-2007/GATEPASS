@@ -9,6 +9,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Defaulter } from '../common/defaulter';
 import { BlockedService } from 'src/blocked/blocked.service';
 import { HostelRepository } from 'src/hostel/hostel.repository';
+import { ParentTokenRepository } from './parent-token.repository';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class PassesService {
@@ -22,6 +24,8 @@ export class PassesService {
         private readonly defaulter: Defaulter,
         private readonly blockedService: BlockedService,
         private readonly hostelRepository: HostelRepository,
+        private readonly parentTokenRepository: ParentTokenRepository,
+        private readonly mailService: MailService,
     ) { }
 
     async getAllPasses(): Promise<any> {
@@ -100,8 +104,40 @@ export class PassesService {
             throw new HttpException('A pass of this type is already active. Cancel the existing pass first.', HttpStatus.CONFLICT);
         }
 
-        return await this.passesRepository.createPass(CreatePass, rollNo);
+        const createdPass = await this.passesRepository.createPass(CreatePass, rollNo);
 
+        if (CreatePass.passtype === 'HOME_PASS') {
+            try {
+                const studentWithUser = await this.prisma.student.findUnique({
+                    where: { Roll_No: rollNo },
+                    include: { user: true },
+                });
+
+                if (studentWithUser) {
+                    const token = await this.parentTokenRepository.createToken(createdPass.passID);
+                    const appUrl = process.env.APP_URL ?? 'http://localhost:3000';
+                    const approveUrl = `${appUrl}/Passes/parent/respond?token=${token}&action=approve`;
+                    const rejectUrl = `${appUrl}/Passes/parent/respond?token=${token}&action=reject`;
+
+                    await this.mailService.sendParentApprovalEmail({
+                        to: studentData.PARENT_MAIL,
+                        studentName: studentWithUser.user?.Name ?? rollNo,
+                        rollNo,
+                        destination: CreatePass.destination,
+                        purpose: CreatePass.purpose,
+                        modeOfTransport: CreatePass.modeOfTransport,
+                        expectedDate: CreatePass.expectedDate,
+                        expectedTime: CreatePass.expectedTime,
+                        approveUrl,
+                        rejectUrl,
+                    });
+                }
+            } catch (error) {
+                console.error("Failed to send parent approval email:", error);
+            }
+        }
+
+        return createdPass;
     }
 
     async cancelPass(id: string, email: string): Promise<any> {
@@ -122,7 +158,7 @@ export class PassesService {
             throw new Error("Student not found");
         }
         const studentBlockId = student.Block_Id;
-        this.passActionsRepository.createAction(found.passID, uid, 'STUDENT', `Pass Cancelled in ${studentBlockId}`).catch(() => {});
+        this.passActionsRepository.createAction(found.passID, uid, 'STUDENT', `Pass Cancelled in ${studentBlockId}`).catch(() => { });
         return await this.passesRepository.cancelPass(found.passID);
     }
 
@@ -142,8 +178,33 @@ export class PassesService {
             throw new Error("Student not found");
         }
         const studentBlockId = student.Block_Id;
-        this.passActionsRepository.createAction(found.passID, null, 'PARENT', `Parent Approved in ${studentBlockId}`).catch(() => {});
+        this.passActionsRepository.createAction(found.passID, null, 'PARENT', `Parent Approved in ${studentBlockId}`).catch(() => { });
         return await this.passesRepository.approveParent(found.passID);
+    }
+
+    async handleParentTokenResponse(token: string, action: 'approve' | 'reject'): Promise<{ status: 'approved' | 'rejected' | 'expired' | 'invalid' }> {
+        const result = await this.parentTokenRepository.consumeToken(token);
+
+        if (!result) {
+            return { status: 'invalid' };
+        }
+
+        const { passId } = result;
+        const found = await this.passesRepository.getPassByPassId(passId);
+
+        if (!found || found.Status !== PassStatus.PENDING) {
+            return { status: 'expired' };
+        }
+
+        if (action === 'approve') {
+            await this.passesRepository.approveParent(passId);
+            this.passActionsRepository.createAction(passId, null, 'PARENT', 'Parent Approved via email link').catch(() => { });
+            return { status: 'approved' };
+        } else {
+            await this.passesRepository.cancelPass(passId);
+            this.passActionsRepository.createAction(passId, null, 'PARENT', 'Parent Rejected via email link').catch(() => { });
+            return { status: 'rejected' };
+        }
     }
 
     async approveCaretaker(id: string, email: string): Promise<any> {
@@ -164,7 +225,7 @@ export class PassesService {
             throw new Error("Student not found");
         }
         const studentBlockId = student.Block_Id;
-        this.passActionsRepository.createAction(found.passID, uid, 'CARETAKER', `Caretaker Approved in ${studentBlockId}`).catch(() => {});
+        this.passActionsRepository.createAction(found.passID, uid, 'CARETAKER', `Caretaker Approved in ${studentBlockId}`).catch(() => { });
         return await this.passesRepository.approveCaretaker(found.passID);
     }
 
@@ -213,6 +274,7 @@ export class PassesService {
                 Roll_No: studentWithUser.Roll_No,
                 Name: studentWithUser.user?.Name ?? '—',
                 Block_Id: studentWithUser.Block_Id,
+                Photo_Url: studentWithUser.Photo_Url ?? null,
             },
         };
     }
@@ -242,7 +304,7 @@ export class PassesService {
             throw new HttpException('Student record not found.', HttpStatus.NOT_FOUND);
         }
         const studentBlockId = studentWithUser.Block_Id;
-        this.passActionsRepository.createAction(found.passID, null, 'SECURITY', `Pass Checked Out at ${studentBlockId}`).catch(() => {});
+        this.passActionsRepository.createAction(found.passID, null, 'SECURITY', `Pass Checked Out at ${studentBlockId}`).catch(() => { });
         const updatedPass = await this.passesRepository.checkout(found.passID);
         return {
             pass: updatedPass,
@@ -290,15 +352,13 @@ export class PassesService {
                             Blocked_Role_ID: hostel.CareTaker_Id,
                         });
                     }
-                } catch (_) {
-                    // Student may already be blocked — ignore, don't crash
-                }
+                } catch (_) { }
             }
         }
 
         const studentBlockId = student.Block_Id;
 
-        this.passActionsRepository.createAction(found.passID, null, 'SECURITY', `Pass Checked In at ${studentBlockId}`).catch(() => {});
+        this.passActionsRepository.createAction(found.passID, null, 'SECURITY', `Pass Checked In at ${studentBlockId}`).catch(() => { });
 
         const updatedPass = await this.passesRepository.checkin(found.passID);
         return {

@@ -11,6 +11,7 @@ export interface Student {
     PARENT_NAME: string;
     ADDRESS: string;
     PARENT_PHONE: string;
+    Photo_Url?: string;
 }
 
 @Injectable()
@@ -28,7 +29,8 @@ export class StudentRepository {
                 PARENT_MAIL: student.PARENT_MAIL,
                 PARENT_NAME: student.PARENT_NAME,
                 ADDRESS: student.ADDRESS,
-                PARENT_PHONE: student.PARENT_PHONE
+                PARENT_PHONE: student.PARENT_PHONE,
+                ...(student.Photo_Url ? { Photo_Url: student.Photo_Url } : {}),
             }
         });
     }
