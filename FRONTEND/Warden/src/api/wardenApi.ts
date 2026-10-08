@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import { getAccessToken } from '../utils/tokenStore';
 
-export const BASE_URL = "http://10.248.49.46:3000";
+export const BASE_URL = "http://10.0.97.17:3000";
 
 async function authHeaders(): Promise<Record<string, string>> {
   const token = await getAccessToken();

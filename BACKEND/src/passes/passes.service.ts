@@ -107,34 +107,36 @@ export class PassesService {
         const createdPass = await this.passesRepository.createPass(CreatePass, rollNo);
 
         if (CreatePass.passtype === 'HOME_PASS') {
-            try {
-                const studentWithUser = await this.prisma.student.findUnique({
-                    where: { Roll_No: rollNo },
-                    include: { user: true },
-                });
-
-                if (studentWithUser) {
-                    const token = await this.parentTokenRepository.createToken(createdPass.passID);
-                    const appUrl = process.env.APP_URL ?? 'http://localhost:3000';
-                    const approveUrl = `${appUrl}/Passes/parent/respond?token=${token}&action=approve`;
-                    const rejectUrl = `${appUrl}/Passes/parent/respond?token=${token}&action=reject`;
-
-                    await this.mailService.sendParentApprovalEmail({
-                        to: studentData.PARENT_MAIL,
-                        studentName: studentWithUser.user?.Name ?? rollNo,
-                        rollNo,
-                        destination: CreatePass.destination,
-                        purpose: CreatePass.purpose,
-                        modeOfTransport: CreatePass.modeOfTransport,
-                        expectedDate: CreatePass.expectedDate,
-                        expectedTime: CreatePass.expectedTime,
-                        approveUrl,
-                        rejectUrl,
+            (async () => {
+                try {
+                    const studentWithUser = await this.prisma.student.findUnique({
+                        where: { Roll_No: rollNo },
+                        include: { user: true },
                     });
+
+                    if (studentWithUser) {
+                        const token = await this.parentTokenRepository.createToken(createdPass.passID);
+                        const appUrl = process.env.APP_URL ?? 'http://localhost:3000';
+                        const approveUrl = `${appUrl}/Passes/parent/respond?token=${token}&action=approve`;
+                        const rejectUrl = `${appUrl}/Passes/parent/respond?token=${token}&action=reject`;
+
+                        await this.mailService.sendParentApprovalEmail({
+                            to: studentData.PARENT_MAIL,
+                            studentName: studentWithUser.user?.Name ?? rollNo,
+                            rollNo,
+                            destination: CreatePass.destination,
+                            purpose: CreatePass.purpose,
+                            modeOfTransport: CreatePass.modeOfTransport,
+                            expectedDate: CreatePass.expectedDate,
+                            expectedTime: CreatePass.expectedTime,
+                            approveUrl,
+                            rejectUrl,
+                        });
+                    }
+                } catch (error) {
+                    console.error("Failed to send parent approval email:", error);
                 }
-            } catch (error) {
-                console.error("Failed to send parent approval email:", error);
-            }
+            })();
         }
 
         return createdPass;

@@ -67,6 +67,7 @@ model Pass {
   Actual_Return_Time String?
   actions            PassAction[]
   student            Student      @relation(fields: [RollNo], references: [Roll_No])
+  @@index([RollNo])
 }
 
 model PassAction {

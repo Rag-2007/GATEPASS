@@ -5,6 +5,17 @@ import { PrismaClient } from '@prisma/client';
 export class PrismaService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger(PrismaService.name);
 
+  constructor() {
+    super({
+      datasources: {
+        db: {
+          url: process.env.DATABASE_URL,
+        },
+      },
+      log: ['warn', 'error'],
+    });
+  }
+
   async onModuleInit() {
     const maxRetries = 5;
     const retryDelayMs = 3000;
@@ -27,3 +38,4 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     }
   }
 }
+

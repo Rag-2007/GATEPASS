@@ -39,4 +39,7 @@ export class AddStudentDto {
   @IsString()
   @IsNotEmpty()
   Parent_Phone!: string;
+
+  @IsString()
+  Photo_Url?: string;
 }

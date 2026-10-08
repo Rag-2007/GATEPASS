@@ -55,11 +55,22 @@ export class StudentRepository {
         return await this.prisma.student.findMany();
     }
 
+    async getAllStudentsWithUser() {
+        return await this.prisma.student.findMany({
+            include: { user: true },
+        });
+    }
+
     async getByHostel(hostelId: string) {
         return await this.prisma.student.findMany({
-            where: {
-                Block_Id: hostelId
-            }
+            where: { Block_Id: hostelId },
+        });
+    }
+
+    async getByHostelWithUser(hostelId: string) {
+        return await this.prisma.student.findMany({
+            where: { Block_Id: hostelId },
+            include: { user: true },
         });
     }
 

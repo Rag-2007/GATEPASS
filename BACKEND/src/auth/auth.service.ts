@@ -59,11 +59,18 @@ export class AuthService {
         if (!user) {
             throw new NotFoundException('User not found');
         }
-        await this.authrepo.updateUser(user.Id, {
-            Name: data.Name,
-            Phone: data.Phone ?? data.PhoneNo,
-        });
-        return { message: 'Profile updated successfully' };
+        try {
+            await this.authrepo.updateUser(user.Id, {
+                Name: data.Name,
+                Phone: data.Phone ?? data.PhoneNo,
+            });
+            return { message: 'Profile updated successfully' };
+        } catch (error: any) {
+            if (error.code === 'P2002') {
+                throw new BadRequestException('This phone number is already registered to another account.');
+            }
+            throw error;
+        }
     }
 
     async ValidateandGenerateTokens(body: LoginDto) {
